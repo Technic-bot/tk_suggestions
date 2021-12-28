@@ -1,0 +1,5 @@
+*.json
+scrap/
+__pycache__/
+*.pyc
+posts/
