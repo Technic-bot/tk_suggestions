@@ -1,5 +1,6 @@
 *.json
 scrap/
 __pycache__/
+imgs/
 *.pyc
 posts/

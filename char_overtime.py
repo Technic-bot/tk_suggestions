@@ -14,10 +14,9 @@ def proc_params():
   parser = argparse.ArgumentParser('Suggestions analyzer')
   parser.add_argument('suggestions', help='Parsed suggestions files csv')
   parser.add_argument('chars_file',default='', help='Char file to analyze')
-  parser.add_argument('--out-prefix',default='out', help='Prefix for output files')
   parser.add_argument('--frequency',default=None, help='Prefix for output files')
   parser.add_argument('--outfile',default='', help='Prefix for output files')
-  parser.add_argument('--winners',action='store_true', help='Make heatmap only over winning sketches')
+  parser.add_argument('--winners',action='store_true', help='Make graph only over winning sketches')
   parser.add_argument('--title',default=None, help='Graph title')
   return parser.parse_args()
 
@@ -85,9 +84,9 @@ if __name__=="__main__":
 #    json.dump(mat,json_file)
   
   cnt = get_counts(sdf,chars,freq=args.frequency)
-  graph_timeseries(cnt,title=args.title)
+  ts = graph_timeseries(cnt,title=args.title)
   if args.outfile:
-    hm.savefig(args.outfile)
+    ts.savefig(args.outfile)
   else:
     plt.show()
   
