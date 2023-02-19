@@ -36,16 +36,24 @@ def read_char_list(txt_file):
   print("Read {} chars".format(len(chars)))
   return chars
   
+def group_time(time_df):
+  """ Group based on day and get average, simple cleans viz"""
+  grp = pd.Grouper(key='date',freq='D')
+  grp_df = time_df.groupby(grp).mean().dropna()
+  return grp_df.reset_index()
+
 def graph_timeframe(time_df,tile="Plots over time"):
+  p_time = group_time(time_df)
+  #  p_time = time_df
   fig,ax = plt.subplots(figsize=(10,8))
   fig.autofmt_xdate()
   ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
   ax.xaxis.set_major_locator(six)
   # ax.xaxis.set_minor_locator(months)
   
-  ax.plot(time_df['date'],time_df['ballots'],label='Ballots')
-  ax.plot(time_df['date'],time_df['suggestions'],label='Suggestions')
-  ax.plot(time_df['date'],time_df['winner_votes'],label='Winner Votes')
+  ax.plot(p_time['date'],p_time['ballots'],label='Ballots')
+  ax.plot(p_time['date'],p_time['suggestions'],label='Suggestions')
+  ax.plot(p_time['date'],p_time['winner_votes'],label='Winner Votes')
   #ax.plot(time_df['date'],time_df['winner_difference'],label='Win difference')
   ax.legend()
   ax.set_title("Suggestions and votes over time")
@@ -63,17 +71,8 @@ def graph_difference(time_df,tile="Vote win difference"):
   ax.set_title("Winner votes and win difference")
   return fig
 
-def graph_dif_hist(time_df,title="Vote difference histogram"):
-  fig,ax = plt.subplots(figsize=(10,8))
-  # ax.xaxis.set_minor_locator(months)
-  bins = np.arange(1,max(time_df['winner_difference'])) 
-  ax.hist(time_df['winner_difference'],bins = bins,label="Win difference",rwidth=0.8,color='#72CDFE',align='left')
-  ax.legend()
-  ax.set_title(title)
-  ax.set_xlabel("Votes difference")
-  ax.set_ylabel("Count")
-  return fig
   
+
 
 def graph_relative_wins(sug_df,title="Suggestions relative wins"):
   
@@ -218,13 +217,12 @@ if __name__=="__main__":
   #dif_fig = graph_difference(time_df)
   f_per,cnt_fig, v_fig = graph_suggestions(char_df)
   f_rel = graph_relative_wins(char_df)
-  f_hist = graph_dif_hist(time_df)
   if args.img_prefix:
     tf_fig.savefig(args.img_prefix + '_timeframe.png')
     f_per.savefig(args.img_prefix + '_pecent_wins.png')
     f_rel.savefig(args.img_prefix + '_relative_wins.png')
     cnt_fig.savefig(args.img_prefix + '_counts.png')
     v_fig.savefig(args.img_prefix + '_votes.png')
-    f_hist.savefig(args.img_prefix + '_hist.png')
   else:
     plt.show()
+    pass

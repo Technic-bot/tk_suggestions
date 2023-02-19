@@ -31,7 +31,8 @@ def parse_timeframe(poll_list):
     all_votes = get_all_votes(winner_id,poll['Ballots'])
     final = places[-2]
     win_diff = abs(final[0]['V'] - final[1]['V'])
-    frame = [date,opts,ballots,winner_votes,all_votes,win_diff]
+    final_votes = max((final[0]['V'], final[1]['V']))
+    frame = [date,opts,ballots,winner_votes,all_votes,win_diff,final_votes]
     timeframe.append(frame)
 
   return  timeframe
@@ -87,7 +88,7 @@ def parse_suggestions(polls):
 
 def persist_timeframe(timeframe,filename):
   header = ['date','suggestions','ballots',
-            'winner_votes','all_votes', 'winner_difference'] 
+            'winner_votes','all_votes', 'winner_difference','final_votes']
   with open(filename,'w') as csv_timeframe:
     csv_writer = csv.writer(csv_timeframe)
     csv_writer.writerow(header)

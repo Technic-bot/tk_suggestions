@@ -8,3 +8,4 @@ python3 char_overtime.py results/analysis/suggestions.csv char_bas.txt --frequen
 python3 relative_coocurrence.py results/analysis/suggestions.csv chars_2.txt --out-prefix results/rel --title Relative suggestions --outfile graphs/coocurrence_recolor.png 
 python3 relative_coocurrence.py results/analysis/suggestions.csv chars_2.txt --out-prefix results/rel --title Relative suggestions --outfile graphs/relative_coocurrence.png 
 python3 process_polls.py results/2017-2021.json --sug results/analysis/2017-2021-suggestions.csv --time results/analysis/2017-2021-timeframe.csv
+python3 process_polls.py results/2017-2022.json --sug results/analysis/2017-2022-suggs.csv --time results/analysis/2017-2022-time.csv

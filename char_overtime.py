@@ -11,7 +11,7 @@ import json
 plt.style.use('seaborn-darkgrid')
 
 def proc_params():
-  parser = argparse.ArgumentParser('Suggestions analyzer')
+  parser = argparse.ArgumentParser('Char suggestions analyzer')
   parser.add_argument('suggestions', help='Parsed suggestions files csv')
   parser.add_argument('chars_file',default='', help='Char file to analyze')
   parser.add_argument('--frequency',default=None, help='Prefix for output files')
