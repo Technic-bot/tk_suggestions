@@ -1,6 +1,9 @@
 #!/bin/bash
 python3 co_ocurrence.py results/anlysis/suggestions.csv chars.txt --outfile graphs/coocurrence.png --out-prefix results/first
 
+python analyze_suggestions.py results/analysis/timeframe.csv results/analysis/2022/2017-2022-suggs.csv  chars.txt --img-prefix graphs/2022/results-2022_
+python analyze_suggestions.py results/analysis/timeframe.csv results/analysis/2022/2017-2022-suggs.csv  chars.txt 
+
 python3 analyze_suggestions.py  results/anlysis/timeframe.csv  results/anlysis/suggestions.csv  chars.txt --img-prefix graphs/results --out-prefix results/anlysis/out-
 python3 co_ocurrence.py results/anlysis/suggestions.csv chars.txt --out-prefix results/first --title All suggestions --winners
 python3 co_ocurrence.py results/anlysis/suggestions.csv chars_2.txt --out-prefix results/first --title All suggestions --outfile graphs/all_coocurrence.png
