@@ -9,7 +9,7 @@ import matplotlib.dates as mdates
 years =mdates.YearLocator()
 months = mdates.MonthLocator()
 six = mdates.MonthLocator(interval=6)
-plt.style.use('seaborn-darkgrid')
+plt.style.use('seaborn-v0_8-dark')
 
 
 def proc_params():
@@ -17,24 +17,11 @@ def proc_params():
   parser.add_argument('timeframe', help='Parsed poll timeframe file csv')
   parser.add_argument('suggestions', help='Parsed suggestions files csv')
   parser.add_argument('chars_file',default='', help='Char file to analyze')
-  parser.add_argument('--out-prefix',default='', help='Prefix for output files')
+  parser.add_argument('--out-prefix',default='', help='Prefix for outputi/debug files')
+  parser.add_argument('--start-date',default='', help='Start of data range')
+  parser.add_argument('--end-date',default='', help='Start of data range')
   parser.add_argument('--img-prefix',default='', help='Prefix for image files')
   return parser.parse_args()
-
-def process_frame(df):
-  """ Generic frame procession """ 
-  df['date'] = pd.to_datetime(df['date'])
-  df.sort_values('date',inplace=True)
-  return
-
-def read_char_list(txt_file):
-  chars = []
-  with open(txt_file,'r') as char_file:
-    for c in char_file.readlines():
-      chars.append(c.strip())
-  
-  print("Read {} chars".format(len(chars)))
-  return chars
   
 def group_time(time_df):
   """ Group based on day and get average, simple cleans viz"""
@@ -70,9 +57,6 @@ def graph_difference(time_df,tile="Vote win difference"):
   ax.legend()
   ax.set_title("Winner votes and win difference")
   return fig
-
-  
-
 
 def graph_relative_wins(sug_df,title="Suggestions relative wins"):
   
@@ -150,21 +134,42 @@ def graph_suggestions(sug_df,tile="Suggestions numerics per character"):
     #color)
   return fig_per,fig_cnt,fig_votes
 
-def make_char_row(sdf,bool_series,fld_lst):
-    tmp_df = sdf.loc[bool_series]
+def make_char_row(sdf, bool_series, fld_lst):
+    # Ultra weird bug, using SEries directly works if original 
+    # df is not sliced. Not sure why
+    tmp_df = sdf.loc[bool_series.values]
     slc_df = tmp_df[fld_lst]
     cnt = slc_df['votes'].count()
     nums = slc_df.sum().to_numpy().flatten() 
     return np.append(nums,cnt)
 
-def process_suggs(sdf,char_list,top=10,prefix='out'):
+def process_frame(df, start_date=None, end_date=None):
+  """ Generic frame procession """ 
+  df['date'] = pd.to_datetime(df['date'])
+  df.sort_values('date',inplace=True)
+  if start_date:
+      print(f"Pruning from {start_date}")
+      df = df.loc[df['date'] > start_date]
+  if end_date:
+      print(f"Pruning up to {end_date}")
+      df = df.loc[df['date'] < end_date] 
+  return df
+
+def read_char_list(txt_file):
+  chars = []
+  with open(txt_file,'r') as char_file:
+    for c in char_file.readlines():
+      chars.append(c.strip())
+  
+  print("Read {} chars".format(len(chars)))
+  return chars
+
+def process_suggs(sdf, char_list, top=10, prefix='out'):
   # Get in order of votes and win difference  
   sdf.sort_values('win_difference',inplace=True,ascending=False)
   top_difference = sdf.loc[0:top,('name','votes','winner','win_difference')]
-  top_difference.to_csv(prefix + "_top_diff.csv")
   sdf.sort_values('votes',inplace=True,ascending=False)
   top_votes = sdf.loc[0:top,('name','votes','winner','win_difference')]
-  top_votes.to_csv(prefix + "_top_votes.csv")
 
   # Get basic top votes 
   sdf['name'] = sdf['name'].str.lower()
@@ -174,7 +179,7 @@ def process_suggs(sdf,char_list,top=10,prefix='out'):
 
   char_dic = {}
   # Get others, not specified in char list
-  all_bool = pd.Series(np.zeros(len(sdf),dtype=bool))
+  all_bool = pd.Series([False]*len(sdf),dtype=bool)
   
   for c in char_list:
     print("Checking for " + c )
@@ -185,19 +190,23 @@ def process_suggs(sdf,char_list,top=10,prefix='out'):
   # Total  
   char_dic['total'] = np.append(sdf[fld_lst].sum().to_numpy(),total_count)
   # Others, for anything no in char list
-  char_dic['others'] = make_char_row(sdf,~all_bool,fld_lst) 
-  sdf.loc[~all_bool].to_csv(prefix + '_others.csv')
+  char_dic['others'] = make_char_row(sdf,(~all_bool),fld_lst) 
   col_list=[]
   col_list.extend(fld_lst)
   col_list.append('count')
 
   char_df = pd.DataFrame.from_dict(char_dic,orient='index',columns=col_list)
   char_df.sort_values('count',inplace=True,ascending=False)
-  print(char_df)
+  # print(char_df)
   # Cant get true probability from this, one suggestion may mention 
   # more than one charcter so it duplicates the count
   #  char_df.loc['others'] = char_df.loc['total'] - char_df.loc[char_df.index != 'total'].sum()
-  char_df.to_csv(prefix + "_counts_df.csv")
+  if prefix:
+      # Mostly debug logs
+      char_df.to_csv(prefix + "_counts_df.csv")
+      top_difference.to_csv(prefix + "_top_diff.csv")
+      top_votes.to_csv(prefix + "_top_votes.csv")
+      sdf.loc[~all_bool].to_csv(prefix + '_others.csv')
   return char_df
 
 
@@ -208,8 +217,12 @@ if __name__=="__main__":
   time_df  = pd.read_csv(args.timeframe)
   chars = read_char_list(args.chars_file)
 
-  process_frame(suggs_df)
-  process_frame(time_df)
+  suggs_df = process_frame(suggs_df,
+                start_date=args.start_date,
+                end_date=args.end_date )
+  time_df = process_frame(time_df,
+                start_date=args.start_date,
+                end_date=args.end_date )
 
   char_df = process_suggs(suggs_df,chars,prefix=args.out_prefix)
 
