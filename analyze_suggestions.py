@@ -87,11 +87,11 @@ def graph_suggestions(sug_df,tile="Suggestions numerics per character"):
   total_wins = sug_df.loc['total','winner']
   cnt_series =  partial_df['count'] / total_cnt * 100
   win_series =  partial_df['winner']/ total_wins * 100
-  ax.bar(pos,cnt_series,width=width,label='Suggestions',tick_label=labels,color='#72CDFE')
-  ax.bar(pos+width,win_series,width=width,label='Wins',tick_label=labels,color='#F7943D')
+  ax.bar(pos,cnt_series,width=width,label='% of Suggestions',tick_label=labels,color='#72CDFE')
+  ax.bar(pos+width,win_series,width=width,label='% of Wins',tick_label=labels,color='#F7943D')
   ax.tick_params(axis='x', labelrotation = 45)
   ax.set_title("Suggestions per character")
-  ax.set_ylabel("Suggestions")
+  ax.set_ylabel("Suggestions [percent]")
   ax.legend()
 
   # Absolute suggestions and wins

@@ -12,3 +12,6 @@ python3 relative_coocurrence.py results/anlysis/suggestions.csv chars_2.txt --ou
 python3 relative_coocurrence.py results/anlysis/suggestions.csv chars_2.txt --out-prefix results/rel --title Relative suggestions --outfile graphs/relative_coocurrence.png 
 python3 process_polls.py results/2017-2021.json --sug results/anlysis/2017-2021-suggestions.csv --time results/anlysis/2017-2021-timeframe.csv
 python3 process_polls.py results/2017-2022.json --sug results/analysis/2017-2022-suggs.csv --time results/analysis/2017-2022-time.csv
+
+ python3 analyze_suggestions.py results/analysis/2024/2024-time.csv results/analysis/2024/2024-suggestions.csv chars.txt --img-prefix graphs/2024/results --out-prefix results/analysis/2024/out-
+
