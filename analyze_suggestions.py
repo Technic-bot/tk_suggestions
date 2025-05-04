@@ -32,15 +32,18 @@ def group_time(time_df):
 def graph_timeframe(time_df,tile="Plots over time"):
   p_time = group_time(time_df)
   #  p_time = time_df
-  fig,ax = plt.subplots(figsize=(10,8))
+  fig,ax = plt.subplots(figsize=(12,8))
   fig.autofmt_xdate()
   ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
   ax.xaxis.set_major_locator(six)
   # ax.xaxis.set_minor_locator(months)
   
-  ax.plot(p_time['date'],p_time['ballots'],label='Ballots')
-  ax.plot(p_time['date'],p_time['suggestions'],label='Suggestions')
-  ax.plot(p_time['date'],p_time['winner_votes'],label='Winner Votes')
+  ax.plot(p_time['date'], p_time['ballots'], label='Ballots',
+          linestyle='-', marker='.')
+  ax.plot(p_time['date'], p_time['suggestions'], label='Suggestions',
+          linestyle='-', marker='.')
+  ax.plot(p_time['date'], p_time['winner_votes'], label='Winner Votes',
+          linestyle='-', marker='.')
   #ax.plot(time_df['date'],time_df['winner_difference'],label='Win difference')
   ax.legend()
   ax.set_title("Suggestions and votes over time")
@@ -227,8 +230,8 @@ if __name__=="__main__":
   char_df = process_suggs(suggs_df,chars,prefix=args.out_prefix)
 
   tf_fig = graph_timeframe(time_df)
-  #dif_fig = graph_difference(time_df)
-  f_per,cnt_fig, v_fig = graph_suggestions(char_df)
+  # dif_fig = graph_difference(time_df)
+  f_per, cnt_fig, v_fig = graph_suggestions(char_df)
   f_rel = graph_relative_wins(char_df)
   if args.img_prefix:
     tf_fig.savefig(args.img_prefix + '_timeframe.png')
